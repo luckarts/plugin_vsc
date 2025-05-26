@@ -1,0 +1,106 @@
+{
+  "name": "code-assist-ai",
+  "displayName": "Code Assistant AI",
+  "description": "AI code assistant powered by Claude 3.7 Sonnet",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.60.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeAssist.start",
+        "title": "Start Code Assistant AI"
+      },
+      {
+        "command": "codeAssist.indexCode",
+        "title": "Index Workspace Code"
+      },
+      {
+        "command": "codeAssist.configureApiKey",
+        "title": "Configure Claude API Key"
+      },
+      {
+        "command": "codeAssist.validateApiKey",
+        "title": "Validate Claude API Key"
+      },
+      {
+        "command": "codeAssist.revokeApiKey",
+        "title": "Revoke Claude API Key"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codeAssistAI",
+          "title": "Code Assistant AI",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "codeAssistAI": [
+        {
+          "id": "codeAssistChat",
+          "name": "Chat",
+          "type": "webview"
+        },
+        {
+          "id": "codeAssistMemories",
+          "name": "Memories"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Code Assistant AI",
+      "properties": {
+        "codeAssist.claudeApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "API key for Claude 3.7 Sonnet (deprecated - use secure storage instead)"
+        },
+        "codeAssist.useEnvironmentVariable": {
+          "type": "boolean",
+          "default": false,
+          "description": "Use CLAUDE_API_KEY environment variable instead of stored key"
+        },
+        "codeAssist.environmentVariableName": {
+          "type": "string",
+          "default": "CLAUDE_API_KEY",
+          "description": "Name of the environment variable containing the Claude API key"
+        },
+        "codeAssist.autoValidateApiKey": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically validate API key on startup"
+        },
+        "codeAssist.apiKeyValidationTimeout": {
+          "type": "number",
+          "default": 10000,
+          "description": "Timeout in milliseconds for API key validation"
+        },
+        "codeAssist.maxContextLength": {
+          "type": "number",
+          "default": 10000,
+          "description": "Maximum context length to send to Claude"
+        },
+        "codeAssist.theme": {
+          "type": "string",
+          "enum": ["light", "dark", "system"],
+          "default": "system",
+          "description": "Theme for the chat interface"
+        },
+        "codeAssist.saveConversations": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically save conversations"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+Cahier des Charges - Extension VSCode "CodeAssist AI"
+1. Présentation du projet
+Développement d'une extension VSCode permettant d'intégrer un agent d'aide au code basé sur Claude 3.7 Sonnet, avec indexation vectorielle du code source pour fournir un contexte pertinent.
+2. Fonctionnalités principales
+Authentification par clé API Claude
+Indexation vectorielle du code source
+Interface de chat intégrée à VSCode
+Récupération contextuelle de code
+3. Architecture technique
+src
+4. Composants clés
+4.1 Gestion de l'API Claude
+src
+4.2 Base de données vectorielle
+src
+4.3 Interface utilisateur
+src
+5. Configuration et paramètres
+6. Sécurité et confidentialité
+Stockage sécurisé de la clé API via l'API SecretStorage de VSCode
+Option pour limiter les fichiers indexés
+Politique claire sur les données envoyées à l'API Claude
+7. Planification
+Configuration initiale du projet (1 semaine)
+Implémentation de l'authentification Claude (1 semaine)
+Développement de la base de données vectorielle (2 semaines)
+Création de l'interface utilisateur (1 semaine)
+Tests et optimisations (1 semaine)
+8. Évolutions futures
+Support pour d'autres modèles d'IA
+Génération de code complète
+Intégration avec les systèmes de contrôle de version
+Suggestions proactives basées sur le contexte
