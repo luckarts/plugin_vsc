@@ -3,14 +3,27 @@
   "displayName": "Code Assistant AI",
   "description": "AI code assistant powered by Claude 3.7 Sonnet",
   "version": "0.1.0",
+  "publisher": "your-publisher-name",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/code-assist-ai"
+  },
   "engines": {
-    "vscode": "^1.60.0"
+    "vscode": "^1.74.0"
   },
   "categories": [
     "Other"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
   "contributes": {
     "commands": [
       {
@@ -91,7 +104,11 @@
         },
         "codeAssist.theme": {
           "type": "string",
-          "enum": ["light", "dark", "system"],
+          "enum": [
+            "light",
+            "dark",
+            "system"
+          ],
           "default": "system",
           "description": "Theme for the chat interface"
         },
@@ -102,5 +119,13 @@
         }
       }
     }
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "@types/vscode": "^1.74.0",
+    "@typescript-eslint/eslint-plugin": "^8.32.1",
+    "@typescript-eslint/parser": "^8.32.1",
+    "eslint": "^9.27.0",
+    "typescript": "^5.8.3"
   }
 }
