@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
-export declare class MemoryManager {
+/**
+ * Legacy MemoryManager for conversation history
+ * @deprecated Use the new intelligent memory system in src/memory/
+ */
+export declare class LegacyMemoryManager {
     private conversationHistory;
     private storageUri;
     constructor(globalStorageUri: vscode.Uri);
@@ -16,4 +20,5 @@ export declare class MemoryManager {
     }[]>;
     clearConversation(): void;
 }
+export declare const MemoryManager: typeof LegacyMemoryManager;
 //# sourceMappingURL=memoryManager.d.ts.map

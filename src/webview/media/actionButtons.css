@@ -1,0 +1,333 @@
+/* Action Buttons Styles */
+
+.action-buttons-container {
+  margin: 16px 0;
+  padding: 16px;
+  background: var(--vscode-editor-background);
+  border: 1px solid var(--vscode-panel-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.action-buttons-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--vscode-panel-border);
+}
+
+.action-buttons-title {
+  font-weight: 600;
+  color: var(--vscode-foreground);
+  font-size: 14px;
+}
+
+.action-buttons-count {
+  font-size: 12px;
+  color: var(--vscode-descriptionForeground);
+  background: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.action-buttons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.action-button {
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  border: 1px solid var(--vscode-button-border);
+  border-radius: 6px;
+  background: var(--vscode-button-background);
+  color: var(--vscode-button-foreground);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-button:hover {
+  background: var(--vscode-button-hoverBackground);
+  border-color: var(--vscode-focusBorder);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.action-button.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: var(--vscode-button-secondaryBackground);
+}
+
+.action-button.disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.button-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.button-icon {
+  font-size: 16px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.button-label {
+  font-weight: 500;
+  flex: 1;
+  font-size: 13px;
+}
+
+.button-confidence {
+  font-size: 11px;
+  background: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.button-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: var(--vscode-descriptionForeground);
+  margin-bottom: 6px;
+}
+
+.button-risk {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.button-impact {
+  font-style: italic;
+  max-width: 60%;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.button-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: var(--vscode-inputOption-activeBackground);
+  color: var(--vscode-inputOption-activeForeground);
+}
+
+.status-icon {
+  font-size: 12px;
+}
+
+.status-text {
+  font-weight: 500;
+}
+
+/* Risk Level Styles */
+.action-button.risk-low {
+  border-left: 4px solid #28a745;
+}
+
+.action-button.risk-medium {
+  border-left: 4px solid #ffc107;
+}
+
+.action-button.risk-high {
+  border-left: 4px solid #fd7e14;
+}
+
+.action-button.risk-critical {
+  border-left: 4px solid #dc3545;
+}
+
+/* Button States */
+.action-button .button-status.loading {
+  background: var(--vscode-progressBar-background);
+  color: var(--vscode-foreground);
+}
+
+.action-button .button-status.loading .status-icon {
+  animation: spin 1s linear infinite;
+}
+
+.action-button .button-status.success {
+  background: #28a745;
+  color: white;
+}
+
+.action-button .button-status.error {
+  background: #dc3545;
+  color: white;
+}
+
+.action-button .button-status.ready {
+  background: var(--vscode-inputOption-activeBackground);
+  color: var(--vscode-inputOption-activeForeground);
+}
+
+.action-button .button-status.disabled {
+  background: var(--vscode-input-background);
+  color: var(--vscode-descriptionForeground);
+}
+
+/* Animations */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.action-button.loading {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .action-buttons-container {
+    margin: 12px 0;
+    padding: 12px;
+  }
+  
+  .action-button {
+    padding: 10px;
+  }
+  
+  .button-main {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  
+  .button-confidence {
+    align-self: flex-end;
+  }
+  
+  .button-details {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  
+  .button-impact {
+    max-width: 100%;
+    text-align: left;
+  }
+}
+
+/* Dark Theme Adjustments */
+.vscode-dark .action-buttons-container {
+  background: var(--vscode-editor-background);
+  border-color: var(--vscode-panel-border);
+}
+
+.vscode-dark .action-button {
+  background: var(--vscode-button-background);
+  border-color: var(--vscode-button-border);
+}
+
+.vscode-dark .action-button:hover {
+  background: var(--vscode-button-hoverBackground);
+}
+
+/* High Contrast Theme */
+.vscode-high-contrast .action-button {
+  border: 2px solid var(--vscode-contrastBorder);
+}
+
+.vscode-high-contrast .action-button:hover {
+  border-color: var(--vscode-contrastActiveBorder);
+}
+
+.vscode-high-contrast .action-button:focus {
+  outline: 2px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+}
+
+/* Accessibility */
+.action-button:focus {
+  outline: 2px solid var(--vscode-focusBorder);
+  outline-offset: 2px;
+}
+
+.action-button[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Tooltip Styles */
+.action-button[title] {
+  position: relative;
+}
+
+.action-button[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--vscode-editorHoverWidget-background);
+  color: var(--vscode-editorHoverWidget-foreground);
+  border: 1px solid var(--vscode-editorHoverWidget-border);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  max-width: 300px;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+/* Button Group Styles */
+.action-buttons-list.horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.action-buttons-list.horizontal .action-button {
+  flex: 1;
+  min-width: 200px;
+}
+
+/* Compact Mode */
+.action-buttons-container.compact {
+  padding: 8px;
+  margin: 8px 0;
+}
+
+.action-buttons-container.compact .action-button {
+  padding: 8px;
+}
+
+.action-buttons-container.compact .button-details {
+  display: none;
+}
+
+.action-buttons-container.compact .button-status {
+  padding: 2px 6px;
+  font-size: 10px;
+}

@@ -1,0 +1,222 @@
+{
+  "server": {
+    "port": 3000,
+    "host": "localhost",
+    "maxConnections": 100,
+    "timeout": 30000,
+    "cors": {
+      "enabled": true,
+      "origins": [
+        "http://localhost:*",
+        "vscode-webview://*",
+        "cursor://*",
+        "claude-desktop://*"
+      ],
+      "credentials": true
+    },
+    "compression": {
+      "enabled": true,
+      "level": 6,
+      "threshold": 1024
+    },
+    "rateLimit": {
+      "windowMs": 900000,
+      "max": 1000,
+      "message": "Too many requests from this IP"
+    }
+  },
+  "auth": {
+    "enabled": true,
+    "tokenExpiry": 3600,
+    "refreshTokenExpiry": 604800,
+    "allowedClients": [
+      "vscode",
+      "cursor", 
+      "claude-desktop",
+      "windsurf",
+      "cline"
+    ],
+    "secretKey": "your-secret-key-change-this-in-production",
+    "bcryptRounds": 12
+  },
+  "vectorStore": {
+    "provider": "chroma",
+    "config": {
+      "chroma": {
+        "host": "localhost",
+        "port": 8000,
+        "ssl": false,
+        "database": "memory_v2",
+        "collection": "memories"
+      },
+      "qdrant": {
+        "host": "localhost",
+        "port": 6333,
+        "ssl": false,
+        "collection": "memories",
+        "apiKey": null
+      }
+    },
+    "dimensions": 384,
+    "similarity": "cosine",
+    "storageDir": "./data/vectors",
+    "maxVectors": 100000,
+    "batchSize": 100,
+    "indexParams": {
+      "efConstruction": 200,
+      "m": 16
+    }
+  },
+  "embedding": {
+    "model": "sentence-transformers/all-MiniLM-L6-v2",
+    "provider": "local",
+    "config": {
+      "local": {
+        "modelPath": "./models",
+        "device": "cpu",
+        "maxLength": 512
+      },
+      "openai": {
+        "apiKey": "your-openai-api-key",
+        "model": "text-embedding-ada-002"
+      },
+      "huggingface": {
+        "apiKey": "your-huggingface-token",
+        "model": "sentence-transformers/all-MiniLM-L6-v2"
+      }
+    },
+    "cacheSize": 1000,
+    "timeout": 10000,
+    "retries": 3,
+    "batchSize": 32
+  },
+  "memory": {
+    "storageDir": "./data/memories",
+    "maxMemorySize": 1000000,
+    "maxMemoriesPerType": 10000,
+    "compressionEnabled": true,
+    "compressionThreshold": 500000,
+    "autoCompress": true,
+    "compressionSchedule": "0 2 * * *",
+    "backupEnabled": true,
+    "backupInterval": 300000,
+    "backupRetention": 30,
+    "indexingEnabled": true,
+    "fullTextSearch": true
+  },
+  "search": {
+    "defaultLimit": 10,
+    "maxLimit": 100,
+    "defaultThreshold": 0.7,
+    "enableFilters": true,
+    "enableHighlighting": true,
+    "enableExplanations": true,
+    "cacheResults": true,
+    "cacheTtl": 300000,
+    "fuzzySearch": {
+      "enabled": true,
+      "maxDistance": 2,
+      "prefixLength": 1
+    }
+  },
+  "performance": {
+    "caching": {
+      "enabled": true,
+      "maxSize": 1000,
+      "ttl": 300000,
+      "checkPeriod": 60000
+    },
+    "pooling": {
+      "enabled": true,
+      "maxConcurrent": 10,
+      "queueSize": 100
+    },
+    "monitoring": {
+      "enabled": true,
+      "metricsInterval": 60000,
+      "healthCheckInterval": 30000
+    }
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "colorize": false,
+    "timestamp": true,
+    "file": {
+      "enabled": true,
+      "filename": "./logs/memory-v2.log",
+      "maxSize": "10MB",
+      "maxFiles": 5,
+      "datePattern": "YYYY-MM-DD"
+    },
+    "console": {
+      "enabled": true,
+      "colorize": true,
+      "timestamp": true
+    },
+    "http": {
+      "enabled": false,
+      "host": "localhost",
+      "port": 3001,
+      "path": "/logs"
+    }
+  },
+  "security": {
+    "helmet": {
+      "enabled": true,
+      "contentSecurityPolicy": {
+        "directives": {
+          "defaultSrc": ["'self'"],
+          "scriptSrc": ["'self'", "'unsafe-inline'"],
+          "styleSrc": ["'self'", "'unsafe-inline'"],
+          "imgSrc": ["'self'", "data:", "https:"]
+        }
+      }
+    },
+    "encryption": {
+      "enabled": false,
+      "algorithm": "aes-256-gcm",
+      "keyDerivation": "pbkdf2"
+    },
+    "audit": {
+      "enabled": true,
+      "logFile": "./logs/audit.log",
+      "events": ["create", "update", "delete", "search"]
+    }
+  },
+  "features": {
+    "webDashboard": {
+      "enabled": false,
+      "port": 3001,
+      "auth": true
+    },
+    "apiDocumentation": {
+      "enabled": true,
+      "path": "/docs",
+      "swagger": true
+    },
+    "healthCheck": {
+      "enabled": true,
+      "path": "/health",
+      "detailed": false
+    },
+    "metrics": {
+      "enabled": true,
+      "path": "/metrics",
+      "prometheus": false
+    }
+  },
+  "development": {
+    "hotReload": true,
+    "debugMode": false,
+    "mockData": false,
+    "testMode": false,
+    "profiling": false
+  },
+  "experimental": {
+    "advancedCompression": false,
+    "multimodalEmbeddings": false,
+    "federatedSearch": false,
+    "aiSummarization": false
+  }
+}

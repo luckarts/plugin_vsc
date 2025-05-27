@@ -45,6 +45,93 @@
       {
         "command": "codeAssist.revokeApiKey",
         "title": "Revoke Claude API Key"
+      },
+      {
+        "command": "codeAssist.clearIndex",
+        "title": "Clear Vector Index"
+      },
+      {
+        "command": "codeAssist.indexStats",
+        "title": "Show Index Statistics"
+      },
+      {
+        "command": "codeAssist.indexCurrentFile",
+        "title": "Index Current File"
+      },
+      {
+        "command": "codeAssist.addMemory",
+        "title": "Add Memory",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.addSelectionToMemory",
+        "title": "Add Selection to Memory",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.searchMemories",
+        "title": "Search Memories",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.openMemoryPanel",
+        "title": "Open Memory Panel",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.compressMemories",
+        "title": "Compress Memories",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.optimizeMemoryStorage",
+        "title": "Optimize Memory Storage",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.memoryStats",
+        "title": "Show Memory Statistics",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.exportMemories",
+        "title": "Export Memories",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.importMemories",
+        "title": "Import Memories",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.createMemoryBackup",
+        "title": "Create Memory Backup",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.restoreMemoryBackup",
+        "title": "Restore Memory Backup",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.addPersonalMemory",
+        "title": "Add Personal Memory",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.addRepositoryMemory",
+        "title": "Add Repository Memory",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.addGuidelineMemory",
+        "title": "Add Guideline Memory",
+        "category": "Code Assistant"
+      },
+      {
+        "command": "codeAssist.runMemoryDemo",
+        "title": "Run Memory System Demo",
+        "category": "Code Assistant"
       }
     ],
     "viewsContainers": {
@@ -116,6 +203,41 @@
           "type": "boolean",
           "default": true,
           "description": "Automatically save conversations"
+        },
+        "codeAssist.memories.maxSize": {
+          "type": "number",
+          "default": 1000000,
+          "description": "Maximum total size of memories before compression (bytes)"
+        },
+        "codeAssist.memories.autoCompress": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically compress memories when threshold is reached"
+        },
+        "codeAssist.memories.compressionThreshold": {
+          "type": "number",
+          "default": 500000,
+          "description": "Size threshold for automatic compression (bytes)"
+        },
+        "codeAssist.memories.maxMemoriesPerType": {
+          "type": "number",
+          "default": 100,
+          "description": "Maximum number of memories per type"
+        },
+        "codeAssist.memories.backupInterval": {
+          "type": "number",
+          "default": 300000,
+          "description": "Automatic backup interval in milliseconds"
+        },
+        "codeAssist.memories.enableAnalytics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable memory usage analytics"
+        },
+        "codeAssist.memories.retentionDays": {
+          "type": "number",
+          "default": 365,
+          "description": "Number of days to retain memories (0 = forever)"
         }
       }
     }
@@ -127,5 +249,9 @@
     "@typescript-eslint/parser": "^8.32.1",
     "eslint": "^9.27.0",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@xenova/transformers": "^2.17.2",
+    "guid-typescript": "^1.0.9"
   }
 }

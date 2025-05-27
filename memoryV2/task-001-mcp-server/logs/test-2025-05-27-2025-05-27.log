@@ -1,0 +1,17 @@
+{"duration":"2ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:15:59.876Z","url":"/mcp","userAgent":"node"}
+{"duration":"2ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:15:59.927Z","url":"/mcp","userAgent":"node"}
+{"duration":"1ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:15:59.942Z","url":"/mcp","userAgent":"node"}
+{"duration":"2ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:15:59.954Z","url":"/mcp","userAgent":"node"}
+{"duration":"1ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:15:59.962Z","url":"/mcp","userAgent":"node"}
+{"duration":"1ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:15:59.974Z","url":"/mcp","userAgent":"node"}
+{"duration":"1ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:15:59.979Z","url":"/mcp","userAgent":"node"}
+{"duration":"1ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:15:59.995Z","url":"/mcp","userAgent":"node"}
+{"duration":"2ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:16:00.010Z","url":"/mcp","userAgent":"node"}
+{"duration":"3ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:16:00.019Z","url":"/mcp","userAgent":"node"}
+{"duration":"1ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:16:00.027Z","url":"/mcp","userAgent":"node"}
+{"duration":"2ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:16:00.035Z","url":"/mcp","userAgent":"node"}
+{"duration":"2ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:16:00.044Z","url":"/mcp","userAgent":"node"}
+{"duration":"1ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:16:00.053Z","url":"/mcp","userAgent":"node"}
+{"duration":"5ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:19:17.263Z","url":"/mcp","userAgent":"node"}
+{"duration":"3ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:27:28.917Z","url":"/mcp","userAgent":"node"}
+{"duration":"4ms","ip":"127.0.0.1","level":"error","message":"HTTP request failed","method":"POST","statusCode":400,"timestamp":"2025-05-27T13:45:19.328Z","url":"/mcp","userAgent":"node"}

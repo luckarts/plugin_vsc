@@ -1,0 +1,302 @@
+/**
+ * Tests for the Intelligent Memory Manager
+ * Note: This file is for documentation purposes and requires a test framework like Jest
+ * To run these tests, install Jest and configure it properly
+ */
+
+import * as vscode from 'vscode';
+import { IntelligentMemoryManager } from '../memoryManager';
+import { MemoryType } from '../types';
+
+// This file is excluded from compilation - it's for reference only
+// To use these tests, set up Jest or another testing framework
+
+// Mock VSCode APIs for testing
+const mockContext = {
+  globalStorageUri: vscode.Uri.file('/tmp/test-storage')
+} as vscode.ExtensionContext;
+
+describe('IntelligentMemoryManager', () => {
+  let memoryManager: IntelligentMemoryManager;
+
+  beforeEach(async () => {
+    memoryManager = new IntelligentMemoryManager(mockContext.globalStorageUri);
+    await memoryManager.initialize();
+  });
+
+  afterEach(async () => {
+    await memoryManager.dispose();
+  });
+
+  describe('Memory CRUD Operations', () => {
+    test('should create a new memory', async () => {
+      const content = 'Always use TypeScript for better type safety';
+      const type = MemoryType.PERSONAL;
+      const tags = ['typescript', 'best-practice'];
+
+      const memoryId = await memoryManager.createMemory(content, type, tags);
+
+      expect(memoryId).toBeDefined();
+      expect(typeof memoryId).toBe('string');
+      expect(memoryId.length).toBeGreaterThan(0);
+    });
+
+    test('should retrieve a memory by ID', async () => {
+      const content = 'Use descriptive variable names';
+      const type = MemoryType.GUIDELINE;
+      const tags = ['clean-code'];
+
+      const memoryId = await memoryManager.createMemory(content, type, tags);
+      const retrievedMemory = await memoryManager.getMemory(memoryId);
+
+      expect(retrievedMemory).toBeDefined();
+      expect(retrievedMemory!.content).toBe(content);
+      expect(retrievedMemory!.type).toBe(type);
+      expect(retrievedMemory!.tags).toEqual(tags);
+    });
+
+    test('should update a memory', async () => {
+      const content = 'Original content';
+      const type = MemoryType.PERSONAL;
+
+      const memoryId = await memoryManager.createMemory(content, type);
+
+      const updatedContent = 'Updated content with more details';
+      await memoryManager.updateMemory(memoryId, { content: updatedContent });
+
+      const retrievedMemory = await memoryManager.getMemory(memoryId);
+      expect(retrievedMemory!.content).toBe(updatedContent);
+    });
+
+    test('should delete a memory', async () => {
+      const content = 'Memory to be deleted';
+      const type = MemoryType.SESSION;
+
+      const memoryId = await memoryManager.createMemory(content, type);
+      await memoryManager.deleteMemory(memoryId);
+
+      const retrievedMemory = await memoryManager.getMemory(memoryId);
+      expect(retrievedMemory).toBeNull();
+    });
+  });
+
+  describe('Memory Search', () => {
+    beforeEach(async () => {
+      // Create test memories
+      await memoryManager.createMemory(
+        'Use async/await for better readability',
+        MemoryType.PERSONAL,
+        ['javascript', 'async', 'best-practice']
+      );
+
+      await memoryManager.createMemory(
+        'Always write unit tests for critical functions',
+        MemoryType.GUIDELINE,
+        ['testing', 'unit-tests', 'quality']
+      );
+
+      await memoryManager.createMemory(
+        'This project uses React with TypeScript',
+        MemoryType.REPOSITORY,
+        ['react', 'typescript', 'frontend']
+      );
+    });
+
+    test('should search memories by content', async () => {
+      const results = await memoryManager.searchMemories('async');
+
+      expect(results.length).toBeGreaterThan(0);
+      expect(results[0].memory.content).toContain('async');
+    });
+
+    test('should search memories by tags', async () => {
+      const results = await memoryManager.searchMemories('typescript');
+
+      expect(results.length).toBeGreaterThan(0);
+      const hasTypescriptTag = results.some(result =>
+        result.memory.tags.includes('typescript')
+      );
+      expect(hasTypescriptTag).toBe(true);
+    });
+
+    test('should filter memories by type', async () => {
+      const results = await memoryManager.searchMemories('', {
+        type: MemoryType.GUIDELINE
+      });
+
+      expect(results.length).toBeGreaterThan(0);
+      results.forEach(result => {
+        expect(result.memory.type).toBe(MemoryType.GUIDELINE);
+      });
+    });
+  });
+
+  describe('Memory Statistics', () => {
+    test('should return accurate statistics', async () => {
+      // Create test memories
+      await memoryManager.createMemory('Personal note', MemoryType.PERSONAL);
+      await memoryManager.createMemory('Repository info', MemoryType.REPOSITORY);
+      await memoryManager.createMemory('Guideline', MemoryType.GUIDELINE);
+
+      const stats = await memoryManager.getStats();
+
+      expect(stats.totalMemories).toBeGreaterThanOrEqual(3);
+      expect(stats.totalSize).toBeGreaterThan(0);
+      expect(stats.memoryByType[MemoryType.PERSONAL]).toBeGreaterThanOrEqual(1);
+      expect(stats.memoryByType[MemoryType.REPOSITORY]).toBeGreaterThanOrEqual(1);
+      expect(stats.memoryByType[MemoryType.GUIDELINE]).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe('Memory Export/Import', () => {
+    test('should export memories as JSON', async () => {
+      await memoryManager.createMemory('Test memory', MemoryType.PERSONAL, ['test']);
+
+      const exportData = await memoryManager.exportMemories({ format: 'json' });
+
+      expect(exportData).toBeDefined();
+      expect(typeof exportData).toBe('string');
+
+      const parsedData = JSON.parse(exportData);
+      expect(Array.isArray(parsedData)).toBe(true);
+      expect(parsedData.length).toBeGreaterThan(0);
+    });
+
+    test('should import memories from JSON', async () => {
+      const testMemories = [
+        {
+          id: 'test-id-1',
+          content: 'Imported memory 1',
+          type: MemoryType.PERSONAL,
+          timestamp: new Date(),
+          size: 17,
+          compressed: false,
+          tags: ['imported'],
+          metadata: {}
+        }
+      ];
+
+      const importData = JSON.stringify(testMemories);
+      const result = await memoryManager.importMemories(importData);
+
+      expect(result.imported).toBe(1);
+      expect(result.errors.length).toBe(0);
+
+      const retrievedMemory = await memoryManager.getMemory('test-id-1');
+      expect(retrievedMemory).toBeDefined();
+      expect(retrievedMemory!.content).toBe('Imported memory 1');
+    });
+  });
+
+  describe('Memory Validation', () => {
+    test('should reject memory with empty content', async () => {
+      await expect(
+        memoryManager.createMemory('', MemoryType.PERSONAL)
+      ).rejects.toThrow();
+    });
+
+    test('should reject memory with invalid type', async () => {
+      await expect(
+        memoryManager.createMemory('Valid content', 'invalid-type' as MemoryType)
+      ).rejects.toThrow();
+    });
+
+    test('should reject memory with too many tags', async () => {
+      const tooManyTags = Array(25).fill('tag'); // More than maxTagsCount (20)
+
+      await expect(
+        memoryManager.createMemory('Valid content', MemoryType.PERSONAL, tooManyTags)
+      ).rejects.toThrow();
+    });
+
+    test('should sanitize and deduplicate tags', async () => {
+      const tags = ['  Tag1  ', 'tag2', 'TAG1', 'tag2']; // Mixed case and duplicates
+
+      const memoryId = await memoryManager.createMemory(
+        'Test content',
+        MemoryType.PERSONAL,
+        tags
+      );
+
+      const memory = await memoryManager.getMemory(memoryId);
+      expect(memory!.tags).toEqual(['tag1', 'tag2']); // Lowercase and deduplicated
+    });
+  });
+
+  describe('Memory Backup and Restore', () => {
+    test('should create a backup', async () => {
+      await memoryManager.createMemory('Backup test', MemoryType.PERSONAL);
+
+      const backup = await memoryManager.createBackup();
+
+      expect(backup).toBeDefined();
+      expect(backup.version).toBeDefined();
+      expect(backup.timestamp).toBeInstanceOf(Date);
+      expect(backup.memories.length).toBeGreaterThan(0);
+      expect(backup.checksum).toBeDefined();
+    });
+
+    test('should restore from backup', async () => {
+      // Create a backup
+      await memoryManager.createMemory('Original memory', MemoryType.PERSONAL);
+      const backup = await memoryManager.createBackup();
+
+      // Clear memories and restore
+      // Note: In a real test, you'd clear the storage first
+      const result = await memoryManager.restoreFromBackup(backup);
+
+      expect(result.imported).toBeGreaterThanOrEqual(0);
+      expect(result.errors.length).toBe(0);
+    });
+  });
+});
+
+// Helper function to run tests
+export async function runMemoryTests(): Promise<void> {
+  console.log('🧪 Running Memory System Tests...');
+
+  try {
+    // This is a simplified test runner
+    // In a real implementation, you'd use Jest or another testing framework
+
+    const memoryManager = new IntelligentMemoryManager(
+      vscode.Uri.file('/tmp/test-memory-system')
+    );
+
+    await memoryManager.initialize();
+
+    // Test basic CRUD operations
+    console.log('✅ Testing CRUD operations...');
+    const memoryId = await memoryManager.createMemory(
+      'Test memory for CRUD operations',
+      MemoryType.PERSONAL,
+      ['test', 'crud']
+    );
+
+    const memory = await memoryManager.getMemory(memoryId);
+    console.log(`✅ Created and retrieved memory: ${memory?.content.substring(0, 50)}...`);
+
+    // Test search
+    console.log('✅ Testing search...');
+    const searchResults = await memoryManager.searchMemories('test');
+    console.log(`✅ Found ${searchResults.length} memories matching 'test'`);
+
+    // Test statistics
+    console.log('✅ Testing statistics...');
+    const stats = await memoryManager.getStats();
+    console.log(`✅ Memory stats: ${stats.totalMemories} memories, ${stats.totalSize} bytes`);
+
+    // Test export
+    console.log('✅ Testing export...');
+    const exportData = await memoryManager.exportMemories();
+    console.log(`✅ Exported ${JSON.parse(exportData).length} memories`);
+
+    await memoryManager.dispose();
+
+    console.log('🎉 All memory system tests passed!');
+
+  } catch (error) {
+    console.error('❌ Memory system tests failed:', error);
+    throw error;
+  }
+}

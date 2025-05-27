@@ -39,7 +39,7 @@ Développement d'une extension VSCode permettant d'intégrer un agent d'aide au 
 
 - [ ] Développer l'algorithme de recherche sémantique
 - [ ] Implémenter la priorisation du code récemment modifié
-- [ ] Créer un système de pondération basé sur la proximité du fichier actif
+- [ x] Créer un système de pondération basé sur la proximité du fichier actif
 - [ ] Développer la détection intelligente du contexte actuel
 - [ ] Implémenter la récupération des imports/dépendances pertinents
 - [ ] Ajouter un système de filtrage par langage/extension
@@ -50,7 +50,7 @@ Développement d'une extension VSCode permettant d'intégrer un agent d'aide au 
 
 - [ ] Concevoir l'interface des boutons d'action
 - [ ] Implémenter le bouton "Apply" pour appliquer les modifications
-- [ ] Développer le système de parsing des suggestions de code
+- [ ] Développer le système de parsing des sugestions de code
 - [ ] Créer le bouton "Create" pour générer de nouveaux fichiers
 - [ ] Implémenter la prévisualisation des modifications avant application
 - [ ] Développer un système d'annulation (undo) des modifications

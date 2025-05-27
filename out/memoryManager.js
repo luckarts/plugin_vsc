@@ -33,9 +33,13 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MemoryManager = void 0;
+exports.MemoryManager = exports.LegacyMemoryManager = void 0;
 const vscode = __importStar(require("vscode"));
-class MemoryManager {
+/**
+ * Legacy MemoryManager for conversation history
+ * @deprecated Use the new intelligent memory system in src/memory/
+ */
+class LegacyMemoryManager {
     constructor(globalStorageUri) {
         this.conversationHistory = [];
         this.storageUri = vscode.Uri.joinPath(globalStorageUri, 'conversations');
@@ -76,5 +80,7 @@ class MemoryManager {
         this.conversationHistory = [];
     }
 }
-exports.MemoryManager = MemoryManager;
+exports.LegacyMemoryManager = LegacyMemoryManager;
+// Re-export for backward compatibility
+exports.MemoryManager = LegacyMemoryManager;
 //# sourceMappingURL=memoryManager.js.map
