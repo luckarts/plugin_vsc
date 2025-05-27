@@ -35,66 +35,73 @@ export class ApiKeyValidator implements IApiKeyValidator {
         return result;
       }
 
-      // Step 2: Test API connection
-      result.details!.apiConnection = await this.testConnection(apiKey);
-      if (!result.details!.apiConnection) {
-        result.error = 'Unable to connect to Claude API. Please check your internet connection and API key.';
+      // Step 1: Validate key format (remains the same)
+      result.details!.keyFormat = this.validateKeyFormat(apiKey);
+      if (!result.details!.keyFormat) {
+        result.error = 'Invalid API key format. Claude API keys should start with "sk-ant-"';
+        // No need to set errorType here as keyFormat failure is specific enough
         return result;
       }
 
-      // Step 3: Test permissions (basic API call)
-      result.details!.permissions = await this.testPermissions(apiKey);
-      if (!result.details!.permissions) {
-        result.error = 'API key does not have sufficient permissions or has been revoked.';
+      // Step 2: Test API permissions and connection (primary validation)
+      const permissionResult = await this.testPermissions(apiKey);
+      
+      result.details = { ...result.details, ...permissionResult.details };
+      result.error = permissionResult.error; // Overwrite error if permission test provides one
+
+      if (!permissionResult.isValid) {
+        // isValid will be false if any check in testPermissions fails
         return result;
       }
-
+      
+      // If testPermissions is successful, all checks have passed
       result.isValid = true;
+      // Clear any intermediate error messages if validation is ultimately successful
+      if (result.isValid) {
+        result.error = undefined;
+      }
       return result;
 
     } catch (error) {
+      // This catch block might handle unexpected errors during the orchestration
+      // or errors from validateKeyFormat if it were to throw.
       result.error = error instanceof Error ? error.message : 'Unknown validation error';
+      if (error instanceof AuthenticationException) {
+        result.details!.errorType = this.mapAuthErrorToErrorType(error.errorType);
+      } else {
+        result.details!.errorType = 'unknown';
+      }
       return result;
     }
   }
 
   /**
-   * Test basic connectivity to Claude API
-   * @param apiKey The API key to test
-   * @returns True if connection successful
+   * Test basic network reachability.
+   * This is a quick check. More detailed validation happens in testPermissions.
+   * @param apiKey (unused, but kept for interface consistency if needed later)
+   * @returns True if the Anthropic API domain is reachable.
    */
-  async testConnection(apiKey: string): Promise<boolean> {
+  async testConnection(_apiKey: string): Promise<boolean> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout / 2); // Shorter timeout for a quick check
 
+      // Using a HEAD request to a known Anthropic endpoint (e.g., base API URL or docs)
+      // For this example, let's assume a HEAD request to the messages endpoint is light enough.
+      // If not, a more suitable, lightweight endpoint should be identified.
       const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
+        method: 'HEAD', // Using HEAD to be lighter, assuming server supports it for this path
         headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
+          // Minimal headers for a reachability test
           'anthropic-version': '2023-06-01'
         },
-        body: JSON.stringify({
-          model: 'claude-3-sonnet-20240229',
-          max_tokens: 1,
-          messages: [{ role: 'user', content: 'test' }]
-        }),
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       clearTimeout(timeoutId);
-
-      // Even if the request fails, if we get a response, the connection works
-      return response.status !== 0;
-
+      return response.status !== 0; // Any response means the server is reachable
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new AuthenticationException(
-          AuthenticationError.VALIDATION_TIMEOUT,
-          'API key validation timed out'
-        );
-      }
+      // Network errors (DNS, connection refused, etc.) or AbortError (timeout)
       return false;
     }
   }
@@ -108,22 +115,31 @@ export class ApiKeyValidator implements IApiKeyValidator {
     if (!apiKey || typeof apiKey !== 'string') {
       return false;
     }
-
     const trimmedKey = apiKey.trim();
-    
-    // Claude API keys typically start with "sk-ant-" and have a specific length
     return trimmedKey.startsWith('sk-ant-') && trimmedKey.length > 20;
   }
 
   /**
-   * Test if the API key has necessary permissions
+   * Test if the API key has necessary permissions and handles various API responses.
    * @param apiKey The API key to test
-   * @returns True if permissions are sufficient
+   * @returns IApiKeyValidationResult with detailed success/failure information.
    */
-  private async testPermissions(apiKey: string): Promise<boolean> {
+  private async testPermissions(apiKey: string): Promise<IApiKeyValidationResult> {
+    const result: IApiKeyValidationResult = {
+      isValid: false,
+      details: {
+        apiConnection: false,
+        authentication: false,
+        permissions: false,
+        errorType: 'unknown',
+      }
+    };
+
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+      }, this.timeout);
 
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -133,26 +149,78 @@ export class ApiKeyValidator implements IApiKeyValidator {
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-3-sonnet-20240229',
-          max_tokens: 10,
-          messages: [{ role: 'user', content: 'Hello' }]
+          model: 'claude-3-sonnet-20240229', // Or a more lightweight model if available
+          max_tokens: 1, // Minimal tokens for a test
+          messages: [{ role: 'user', content: 'test' }] // Minimal valid payload
         }),
         signal: controller.signal
       });
 
       clearTimeout(timeoutId);
+      result.details!.statusCode = response.status;
+      result.details!.apiConnection = true; // If we got a response, connection is true
 
-      // Check for successful response or expected error codes
-      return response.status === 200 || response.status === 400; // 400 might be rate limit or quota
-
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new AuthenticationException(
-          AuthenticationError.VALIDATION_TIMEOUT,
-          'Permission test timed out'
-        );
+      if (response.status === 200) {
+        result.isValid = true;
+        result.details!.authentication = true;
+        result.details!.permissions = true;
+        result.error = undefined; // Clear error on success
+      } else if (response.status === 401 || response.status === 403) {
+        result.error = 'API key is invalid, revoked, or lacks permissions.';
+        result.details!.authentication = false; // Key not accepted
+        result.details!.permissions = false;
+        result.details!.errorType = 'auth';
+      } else if (response.status === 400) {
+        result.error = 'Bad request. Check model access, account quota, or request format.';
+        result.details!.authentication = true; // Key was likely fine, but request was bad
+        result.details!.permissions = false;
+        result.details!.errorType = 'badrequest';
+      } else if (response.status === 429) {
+        result.error = 'Rate limit exceeded or quota issue. Please try again later or check your Anthropic plan.';
+        result.details!.authentication = true; // Key is fine
+        result.details!.permissions = false; // But cannot perform action now
+        result.details!.errorType = 'ratelimit';
+      } else if (response.status >= 500) {
+        result.error = 'Anthropic API server error. Please try again later.';
+        result.details!.authentication = true; // Assume key is fine, server issue
+        result.details!.permissions = false;
+        result.details!.errorType = 'server';
+      } else {
+        result.error = `Unexpected API response status: ${response.status}.`;
+        result.details!.errorType = 'unknown';
       }
-      return false;
+    } catch (error) {
+      result.details!.apiConnection = false; // Network or other fetch-level error
+      if (error instanceof Error && error.name === 'AbortError') {
+        result.error = 'API request timed out.';
+        result.details!.errorType = 'timeout';
+      } else if (error instanceof TypeError && error.message.includes('fetch')) {
+        // This can catch network errors like DNS resolution failure, host unreachable
+        result.error = 'Network error: Unable to reach Anthropic API.';
+        result.details!.errorType = 'network';
+      }
+      else {
+        result.error = 'Failed to test permissions due to an unexpected error.';
+        result.details!.errorType = 'unknown';
+        if (error instanceof AuthenticationException) { // Propagate if it's already one of ours
+            throw error;
+        }
+      }
+    }
+    return result;
+  }
+  
+  private mapAuthErrorToErrorType(authError: AuthenticationError): IApiKeyValidationResult['details']['errorType'] {
+    switch (authError) {
+      case AuthenticationError.VALIDATION_TIMEOUT:
+        return 'timeout';
+      case AuthenticationError.NETWORK_ERROR:
+        return 'network';
+      case AuthenticationError.PERMISSION_DENIED:
+      case AuthenticationError.INVALID_API_KEY: // map invalid key to auth error type
+        return 'auth';
+      default:
+        return 'unknown';
     }
   }
 
@@ -163,21 +231,51 @@ export class ApiKeyValidator implements IApiKeyValidator {
    */
   static getValidationErrorMessage(result: IApiKeyValidationResult): string {
     if (result.isValid) {
-      return 'API key is valid';
+      return 'API key is valid and has necessary permissions.';
     }
 
+    // Order of checks matters for providing the most relevant error message.
     if (!result.details?.keyFormat) {
-      return 'Invalid API key format. Please ensure you have copied the complete key from Anthropic.';
+      return result.error || 'Invalid API key format. Ensure it starts with "sk-ant-" and is copied correctly.';
     }
 
-    if (!result.details?.apiConnection) {
+    // Specific error types from testPermissions
+    if (result.details?.errorType) {
+      switch (result.details.errorType) {
+        case 'network':
+          return result.error || 'Network error: Unable to connect to Anthropic API. Please check your internet connection.';
+        case 'timeout':
+          return result.error || 'API request timed out. Please check your internet connection or try again later.';
+        case 'auth':
+          return result.error || 'Authentication failed: The API key is invalid, revoked, or not authorized. Please check your key and Anthropic account.';
+        case 'permission': // Should ideally be covered by 'auth' or a successful (200) 'permissions: true'
+          return result.error || 'Permission denied: The API key may lack specific permissions for this operation.';
+        case 'ratelimit':
+          return result.error || 'Rate limit exceeded or quota issue. Please check your Anthropic plan or try again later.';
+        case 'server':
+          return result.error || 'Anthropic API server error. Please try again later.';
+        case 'badrequest':
+          return result.error || 'Bad request: There might be an issue with the request configuration, model access, or your account quota. Please check Anthropic dashboard.';
+        case 'unknown':
+          return result.error || 'An unknown error occurred during API key validation.';
+      }
+    }
+    
+    // Fallback messages based on boolean flags, though errorType should be more specific.
+    if (result.details?.apiConnection === false) { // Explicitly check for false, as undefined means not checked or irrelevant
       return 'Cannot connect to Claude API. Please check your internet connection.';
     }
 
-    if (!result.details?.permissions) {
-      return 'API key lacks necessary permissions or may be expired. Please check your Anthropic account.';
+    if (result.details?.authentication === false) {
+      return 'API key authentication failed. It might be invalid or revoked.';
+    }
+    
+    if (result.details?.permissions === false) {
+      // This message might be too generic if errorType has already provided a specific one.
+      // Consider if this is still needed or if errorType covers all permission-like issues.
+      return 'API key seems valid but lacks permissions for the test operation, or another issue occurred (e.g. rate limit, server error).';
     }
 
-    return result.error || 'Unknown validation error';
+    return result.error || 'Unknown validation error. Please check the logs for more details.';
   }
 }

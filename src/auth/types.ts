@@ -2,14 +2,19 @@
  * Types and interfaces for authentication module
  */
 
+export interface IApiKeyValidationDetails {
+  keyFormat?: boolean;
+  apiConnection?: boolean; // True if server is reachable
+  authentication?: boolean; // True if key is recognized as valid (e.g. not 401/403)
+  permissions?: boolean; // True if key has permissions for the specific action (e.g. 200 OK for test call)
+  statusCode?: number; // Store the actual HTTP status code
+  errorType?: 'network' | 'timeout' | 'auth' | 'permission' | 'ratelimit' | 'server' | 'badrequest' | 'unknown';
+}
+
 export interface IApiKeyValidationResult {
   isValid: boolean;
   error?: string;
-  details?: {
-    keyFormat: boolean;
-    apiConnection: boolean;
-    permissions: boolean;
-  };
+  details?: IApiKeyValidationDetails;
 }
 
 export interface IAuthenticationConfig {
